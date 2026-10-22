@@ -1,0 +1,70 @@
+{
+  "format": 1,
+  "title": {
+    "en": "yangxiaoyu's DSH plugins",
+    "zh": "yangxiaoyu 的 DSH 插件"
+  },
+  "description": {
+    "en": "Self-hosted DSH plugin index.",
+    "zh": "自建的 DSH 插件索引。"
+  },
+  "metadata": {
+    "categories": {
+      "sync": {
+        "title": {
+          "en": "Sync & backup",
+          "zh": "同步与备份"
+        }
+      }
+    },
+    "labels": {
+      "cloudflare": {
+        "title": {
+          "en": "Cloudflare",
+          "zh": "Cloudflare"
+        }
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "@local/cf-session-sync",
+      "title": {
+        "en": "Cloudflare Session Sync",
+        "zh": "Cloudflare 会话同步"
+      },
+      "description": {
+        "en": "Uploads every local DSH session log to your own Cloudflare Worker, with incremental sync and a read-only web viewer.",
+        "zh": "把本机全部 DSH 会话日志同步到你自己的 Cloudflare Worker，支持增量同步，并自带只读浏览页。"
+      },
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByb2xlPSJpbWciIGFyaWEtbGFiZWw9IkNsb3VkZmxhcmUgc2Vzc2lvbiBzeW5jIj4KICA8cmVjdCB4PSIyIiB5PSIyIiB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHJ4PSIxNCIgZmlsbD0iIzBmMTcyYSIvPgogIDxwYXRoIGQ9Ik0yMCA0MGgyNmE4IDggMCAwIDAgLjYtMTUuOThBMTEuNSAxMS41IDAgMCAwIDI1LjQgMjYuM0E3IDcgMCAwIDAgMjAgNDBaIgogICAgICAgIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Y2YzQ0NSIgc3Ryb2tlLXdpZHRoPSIzLjQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMzIgNDZWMzEiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2Y2YzQ0NSIgc3Ryb2tlLXdpZHRoPSIzLjQiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgogIDxwYXRoIGQ9Ik0yNi41IDM2LjUgMzIgMzFsNS41IDUuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZjZjNDQ1IiBzdHJva2Utd2lkdGg9IjMuNCIKICAgICAgICBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==",
+      "author": "yangxiaoyu",
+      "metadata": {
+        "category": "sync",
+        "keywords": [
+          "cloudflare",
+          "session",
+          "backup",
+          "d1"
+        ],
+        "labels": [
+          "cloudflare"
+        ]
+      },
+      "versions": [
+        {
+          "version": "1.0.0",
+          "publishTimestamp": 1792664279,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/OWNER/cf-session-sync",
+            "commit": "bfc68759760b54ac45b1accd6cd95e7320b642bb"
+          },
+          "engines": {
+            "dsh": ">=0.2.0"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -13,7 +13,7 @@
 
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
-import { hostname } from 'node:os'
+import { homedir, hostname } from 'node:os'
 
 export const inject = ['sessionQuery', 'timer']
 
@@ -30,6 +30,14 @@ function clampInt(value, min, max, fallback) {
 
 function text(value) {
   return typeof value === 'string' ? value.trim() : ''
+}
+
+/** Expand a leading `~` (and `~/`), which Node's fs calls do not do themselves. */
+function expandHome(target) {
+  if (!target) return target
+  if (target === '~') return homedir()
+  if (target.startsWith('~/')) return `${homedir()}/${target.slice(2)}`
+  return target
 }
 
 function messageOf(error) {
@@ -140,7 +148,7 @@ export function apply(ctx, config) {
     }
     if (cfg.tokenFile) {
       try {
-        const fromFile = readFileSync(cfg.tokenFile, 'utf8').trim()
+        const fromFile = readFileSync(expandHome(cfg.tokenFile), 'utf8').trim()
         if (fromFile) return { token: fromFile, source: 'token-file' }
       } catch {
         // A missing or unreadable file behaves like an unset one.

@@ -53,12 +53,12 @@
       },
       "versions": [
         {
-          "version": "1.0.0",
-          "publishTimestamp": 1792664279,
+          "version": "1.0.1",
+          "publishTimestamp": 1792665239,
           "source": {
             "type": "git",
             "url": "https://github.com/ChinaRedArmy1930/cf-session-sync",
-            "commit": "21832f329fa18d25016736ba96ca5781a5f5ca63"
+            "commit": "b75b3e17857abbafa9527708c21f8daa08c37f41"
           },
           "engines": {
             "dsh": ">=0.2.0"

@@ -1,0 +1,29 @@
+# Cloudflare session sync — insert the Host + Client plugin row.
+#
+# Override this row from the profile's own cordis.patch.yml to configure it:
+#
+#   - id: cf-session-sync
+#     name: '@local/cf-session-sync'
+#     config:
+#       endpoint: 'https://dsh-sync.<your-subdomain>.workers.dev'
+#       tokenRef: 'CF_SESSION_SYNC_TOKEN'
+#
+# The token itself belongs in the credential service: set it from
+# Settings -> Cloudflare Sync, or with `ctx.credentials.set('CF_SESSION_SYNC_TOKEN', ...)`.
+# A process environment variable of that name works as an ambient fallback.
+#
+- insert:
+    - id: cf-session-sync
+      name: '@local/cf-session-sync'
+      config:
+        endpoint: ''
+        tokenRef: 'CF_SESSION_SYNC_TOKEN'
+        # Legacy plaintext fallback; leave empty and use the credential store.
+        token: ''
+        device: ''
+        syncOnStart: true
+        autoSync: true
+        includeSubagents: true
+        debounceMs: 4000
+        maxEventsPerRequest: 300
+        requestTimeoutMs: 25000

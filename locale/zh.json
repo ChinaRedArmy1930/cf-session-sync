@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Cloudflare 会话同步",
+    "description": "把本机全部 DeepSeek Harness 会话日志同步到你自己的 Cloudflare Worker，支持增量同步，并自带一个只读的网页浏览器。"
+  }
+}

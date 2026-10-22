@@ -1,0 +1,30 @@
+{
+  "name": "@local/cf-session-sync",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sync every local DeepSeek Harness session log to your own Cloudflare Worker.",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "worker"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

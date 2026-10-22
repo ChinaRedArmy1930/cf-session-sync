@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Cloudflare Session Sync",
+    "description": "Uploads every local DeepSeek Harness session log to your own Cloudflare Worker, with an incremental sync and a read-only web viewer."
+  }
+}

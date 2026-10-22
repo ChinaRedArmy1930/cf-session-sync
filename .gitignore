@@ -1,0 +1,20 @@
+# Dependencies and build output
+node_modules/
+*.log
+
+# Local machine state: real D1 id, real custom-domain route, real hostnames.
+worker/wrangler.local.toml
+
+# Local secrets — never commit these.
+.env
+.env.*
+.credentials.yaml
+*.pem
+*.key
+
+# macOS
+.DS_Store
+
+# wrangler local state: account id and auth cache
+worker/.wrangler/
+.wrangler/

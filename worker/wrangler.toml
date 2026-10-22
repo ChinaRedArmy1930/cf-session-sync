@@ -1,0 +1,25 @@
+name = "dsh-session-sync"
+main = "worker.js"
+compatibility_date = "2025-01-01"
+workers_dev = true
+
+# Optional: serve the Worker from your own Cloudflare zone instead of
+# `*.workers.dev`, which some corporate networks block. Uncomment, put your own
+# hostname in, and make sure the zone is active in this account.
+#
+# This key MUST stay above the first [[table]] header: in TOML every key after a
+# table header belongs to that table.
+# routes = [
+#   { pattern = "sync.example.com", custom_domain = true }
+# ]
+
+# D1 binding used by worker.js. `wrangler d1 create` prints a sample block that
+# suggests `binding = "dsh_sessions"`; keep it as "DB" here because worker.js
+# reads env.DB. Only the name of the binding in this file matters.
+[[d1_databases]]
+binding = "DB"
+database_name = "dsh-sessions"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# The shared secret is not stored here. Set it once with:
+#   wrangler secret put SYNC_TOKEN

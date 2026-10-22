@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cloudflare session sync">
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="#0f172a"/>
+  <path d="M20 40h26a8 8 0 0 0 .6-15.98A11.5 11.5 0 0 0 25.4 26.3A7 7 0 0 0 20 40Z"
+        fill="none" stroke="#f6c445" stroke-width="3.4" stroke-linejoin="round"/>
+  <path d="M32 46V31" fill="none" stroke="#f6c445" stroke-width="3.4" stroke-linecap="round"/>
+  <path d="M26.5 36.5 32 31l5.5 5.5" fill="none" stroke="#f6c445" stroke-width="3.4"
+        stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

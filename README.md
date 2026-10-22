@@ -79,7 +79,32 @@ wrangler deploy
 | `maxEventsPerRequest` | `300` | 每次 POST 携带的事件条数，大会话会被切成多批 |
 | `requestTimeoutMs` | `25000` | 单次 HTTP 超时 |
 
-## 三、Token 存在哪（凭据服务）
+## 三、换机器（推荐流程，不用复制粘贴 Token）
+
+把配置交给一个**已经在同步的 dotfile**，新机器只装插件，不用再填任何值。
+
+一次性准备（在任意一台机器上）：
+
+```bash
+mkdir -p ~/.config/dsh
+cat > ~/.config/dsh/env.sh <<'EOF'
+export CF_SYNC_ENDPOINT='https://sync.<你的域名>'
+export CF_SESSION_SYNC_TOKEN='<SYNC_TOKEN>'
+EOF
+echo '[ -f ~/.config/dsh/env.sh ] && . ~/.config/dsh/env.sh' >> ~/.zshrc
+```
+
+然后把 `~/.config/dsh/env.sh` 放进 iCloud（`~/Library/Mobile Documents/...`）或你自己的私有 dotfiles 仓库。
+
+新机器上：
+
+1. dotfiles 到位（iCloud 自动同步 / `git clone` + 建软链）；
+2. 装插件：设置 → 插件 → Discover → 装；
+3. 打开 DSH。`CF_SESSION_SYNC_TOKEN` 由凭据服务的环境变量兜底解析，`CF_SYNC_ENDPOINT` 由插件读取 —— 直接就是已配置状态，`syncOnStart` 立刻全量。
+
+两个变量都可以只给一个：`CF_SYNC_ENDPOINT` 不设时读 `config.endpoint`；`CF_SESSION_SYNC_TOKEN` 不设时读凭据服务里存的同名 ref，再回落到 `config.token`。
+
+## 四、Token 存在哪（凭据服务）
 
 插件不再把 Token 写在 YAML 里。它每次同步前调用 `ctx.credentials.resolve('CF_SESSION_SYNC_TOKEN')`，解析顺序是：
 
@@ -107,7 +132,7 @@ export CF_SESSION_SYNC_TOKEN='...'
 - 空值视为"不存在"（凭据服务的约定），所以「清除」是 `unset` 而不是写入空串。
 - 当前 profile 没有 `credentials` 服务时，设置页会提示，`config.token` 兜底仍然可用。
 
-## 四、用起来
+## 五、用起来
 
 - **手动**：设置 → **Cloudflare 同步** → 「立即同步」。
 - **自动**：回合结束后 4 秒自动增量同步该会话。

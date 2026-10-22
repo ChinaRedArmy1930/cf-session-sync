@@ -46,8 +46,12 @@ function normalizeConfig(config) {
       device = 'dsh'
     }
   }
+  // `CF_SYNC_ENDPOINT` lets a machine be configured purely from the environment:
+  // together with the credential service's own CF_SESSION_SYNC_TOKEN fallback,
+  // a synced dotfile is enough to bring a fresh machine online.
+  const endpoint = text(raw.endpoint) || text(process.env.CF_SYNC_ENDPOINT)
   return {
-    endpoint: text(raw.endpoint).replace(/\/+$/, ''),
+    endpoint: endpoint.replace(/\/+$/, ''),
     token: text(raw.token),
     tokenRef: text(raw.tokenRef) || 'CF_SESSION_SYNC_TOKEN',
     device,

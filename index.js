@@ -17,7 +17,8 @@ import { homedir, hostname } from 'node:os'
 
 export const inject = ['sessionQuery', 'timer']
 
-const VERSION = '1.0.0'
+// Derived from the manifest so a release cannot drift from the code.
+const VERSION = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version
 const STATUS_PATH = '/cf-sync/status'
 const RUN_PATH = '/cf-sync/run'
 const TOKEN_PATH = '/cf-sync/token'

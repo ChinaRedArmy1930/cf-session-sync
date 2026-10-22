@@ -58,7 +58,7 @@
           "source": {
             "type": "git",
             "url": "https://github.com/ChinaRedArmy1930/cf-session-sync",
-            "commit": "bfc68759760b54ac45b1accd6cd95e7320b642bb"
+            "commit": "21832f329fa18d25016736ba96ca5781a5f5ca63"
           },
           "engines": {
             "dsh": ">=0.2.0"

@@ -57,7 +57,7 @@
           "publishTimestamp": 1792664279,
           "source": {
             "type": "git",
-            "url": "https://github.com/OWNER/cf-session-sync",
+            "url": "https://github.com/ChinaRedArmy1930/cf-session-sync",
             "commit": "bfc68759760b54ac45b1accd6cd95e7320b642bb"
           },
           "engines": {

@@ -138,6 +138,23 @@ export CF_SESSION_SYNC_TOKEN='...'
 - **自动**：回合结束后 4 秒自动增量同步该会话。
 - **浏览**：打开 `https://<worker>/?t=<SYNC_TOKEN>`，首次访问写 cookie 后跳转干净 URL。
 
+## 发版流程（顺序不能变）
+
+索引本身也在仓库里，所以"给索引打 tag"这件事有严格的先后顺序：
+
+1. 改代码 → commit（记为 `C`）；
+2. 把 `market/index.json` 的 `version` 和 `source.commit` 改成新版本和 `C` → commit；
+3. **在索引这个 commit 上**打 tag，且只推一次：`git tag vX.Y.Z && git push origin vX.Y.Z`。
+
+**tag 一旦推送就不要移动**。jsDelivr 会把 `tag → commit` 的映射缓存下来，之后 `git tag -f` + 强推也不会刷新，`purge.jsdelivr.net` 也清不掉——我这次就踩了：`v1.0.1` 指到了代码 commit，索引读出来还是 1.0.0。
+
+两种索引地址的取舍：
+
+| 地址 | 新鲜度 | 适合 |
+| --- | --- | --- |
+| `raw.githubusercontent.com/<owner>/<repo>/main/market/index.json` | 约 5 分钟 | 自己用，发版即刻可见 |
+| `cdn.jsdelivr.net/gh/<owner>/<repo>@vX.Y.Z/market/index.json` | 永久不可变 | 给别人用，前提是 tag 永不移动 |
+
 ## 同步语义
 
 - **不落地本地状态**。云端 `/api/cursors` 就是游标：每台机器、每次重装都从云端已有的 `lastSeq` 继续。

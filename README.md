@@ -70,7 +70,8 @@ wrangler deploy
 | --- | --- | --- |
 | `endpoint` | `''` | Worker 基地址，末尾斜杠会被去掉 |
 | `tokenRef` | `'CF_SESSION_SYNC_TOKEN'` | 凭据键名；插件每次操作都重新解析它 |
-| `token` | `''` | **遗留兜底**，仅当凭据服务里没有该键时才用；建议留空 |
+| `tokenFile` | `''` | 从文件读 Token（一行，自动 trim）。指向 iCloud/dotfiles 路径即可跨机器零粘贴 |
+| `token` | `''` | **遗留兜底**，仅当前两者都没有时才用；建议留空 |
 | `device` | 主机名 | 写入 D1 的设备标签，多机同步时用来区分 |
 | `syncOnStart` | `true` | 插件激活后约 1.5s 跑一次全量 |
 | `autoSync` | `true` | 每个回合结束（`turn/end`）后对**那一个**会话做增量 |
@@ -79,52 +80,62 @@ wrangler deploy
 | `maxEventsPerRequest` | `300` | 每次 POST 携带的事件条数，大会话会被切成多批 |
 | `requestTimeoutMs` | `25000` | 单次 HTTP 超时 |
 
-## 三、换机器（推荐流程，不用复制粘贴 Token）
+## 三、换机器（怎样最省事）
 
-把配置交给一个**已经在同步的 dotfile**，新机器只装插件，不用再填任何值。
+先纠正一个常见误解：**macOS 上从 Dock/Finder 启动的 app 不读 `.zshrc`**（GUI 进程拿到的是 launchd 环境）。所以把 `export` 写进 shell 配置，对桌面版 DSH **无效**——那些变量只有从终端启动 `dsh` 时才会传进去。
 
-一次性准备（在任意一台机器上）：
+真正可行的三种，按代价排序：
+
+| 方案 | 新机器要做什么 | 代价 |
+| --- | --- | --- |
+| **A. 粘一次** | 设置页粘一次 Token（20 秒） | 每次换机一次手工动作 |
+| **B. Token 文件** | 什么都不用做 | 密钥进同步盘（iCloud 加密存储） |
+| **C. launchctl** | 装 LaunchAgent | 要给每台机器装 plist，不推荐 |
+
+**推荐 B（追求零粘贴）**：把 Token 写到一个会被同步的文件里，插件每次同步前读它。
 
 ```bash
-mkdir -p ~/.config/dsh
-cat > ~/.config/dsh/env.sh <<'EOF'
-export CF_SYNC_ENDPOINT='https://sync.<你的域名>'
-export CF_SESSION_SYNC_TOKEN='<SYNC_TOKEN>'
-EOF
-echo '[ -f ~/.config/dsh/env.sh ] && . ~/.config/dsh/env.sh' >> ~/.zshrc
+# 这台机器上，一次性
+mkdir -p ~/Library/Mobile\ Documents/com~apple~CloudDocs/dsh
+printf '%s\n' '<SYNC_TOKEN>' > ~/Library/Mobile\ Documents/com~apple~CloudDocs/dsh/cf-sync-token
+chmod 600 ~/Library/Mobile\ Documents/com~apple~CloudDocs/dsh/cf-sync-token
 ```
 
-然后把 `~/.config/dsh/env.sh` 放进 iCloud（`~/Library/Mobile Documents/...`）或你自己的私有 dotfiles 仓库。
+然后在 profile 的 `cordis.patch.yml` 里指过去（路径两台机器一样，因为 iCloud 的路径是固定的）：
 
-新机器上：
+```yaml
+- id: cf-session-sync
+  name: '@local/cf-session-sync'
+  config:
+    endpoint: 'https://sync.<你的域名>'
+    tokenFile: '~/Library/Mobile Documents/com~apple~CloudDocs/dsh/cf-sync-token'
+```
 
-1. dotfiles 到位（iCloud 自动同步 / `git clone` + 建软链）；
-2. 装插件：设置 → 插件 → Discover → 装；
-3. 打开 DSH。`CF_SESSION_SYNC_TOKEN` 由凭据服务的环境变量兜底解析，`CF_SYNC_ENDPOINT` 由插件读取 —— 直接就是已配置状态，`syncOnStart` 立刻全量。
+解析优先级：**凭据服务 → `tokenFile` → `config.token`**。设置页里存的 Token 依然优先，所以两种方式不冲突。
 
-两个变量都可以只给一个：`CF_SYNC_ENDPOINT` 不设时读 `config.endpoint`；`CF_SESSION_SYNC_TOKEN` 不设时读凭据服务里存的同名 ref，再回落到 `config.token`。
+新机器：iCloud 同步到位 → 装插件 → 打开 DSH，直接就是已配置。token 全程不用手打。
+
+**推荐 A（更保守）**：不把密钥放到任何同步服务里，每台机器在设置页粘一次。20 秒，且密钥只存在那台机器上。
+
+`CF_SYNC_ENDPOINT` / `CF_SESSION_SYNC_TOKEN` / `CF_SYNC_TOKEN_FILE` 三个环境变量仍然支持，但只对**从终端启动**的 DSH 有意义。
 
 ## 四、Token 存在哪（凭据服务）
 
-插件不再把 Token 写在 YAML 里。它每次同步前调用 `ctx.credentials.resolve('CF_SESSION_SYNC_TOKEN')`，解析顺序是：
+插件不再把 Token 写在 YAML 里。每次同步前按这个顺序解析，**每次操作都重新读，不缓存**：
 
 ```
-凭据服务（profile-managed store）
-  → 进程环境变量 CF_SESSION_SYNC_TOKEN
-  → .env 文件
-  → config.token（遗留兜底）
+凭据服务（ctx.credentials.resolve('CF_SESSION_SYNC_TOKEN')）
+  └ 内部还有一层：进程环境变量 CF_SESSION_SYNC_TOKEN → .env 文件
+→ config.tokenFile（文件内容 trim）
+→ config.token（遗留兜底）
 ```
 
 **设置页填写**：设置 → Cloudflare 同步 → 「Sync token」输入框 → 保存。
 值落到 `~/.dsh/.credentials.yaml` 的 `refs.CF_SESSION_SYNC_TOKEN`，页面只显示来源（凭据服务 / 配置文件 / 未配置），从不回显明文。
 
-**换机器时**：新机器的 profile patch 只写 `endpoint`（和 `device`），装好插件后在设置页粘一次 Token 即可；或者直接
+**换机器时**：两条路，见第三节——设置页粘一次（A），或 `tokenFile` 指向 iCloud 里的一行文本（B，零粘贴）。
 
-```bash
-export CF_SESSION_SYNC_TOKEN='...'
-```
-
-给 DSH 进程用环境变量兜底，连设置页都不用点。
+环境变量那条只在**从终端启动** DSH 时有效，桌面版从 Dock 启动读不到 `.zshrc`。
 
 几点行为：
 

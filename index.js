@@ -12,6 +12,7 @@
  */
 
 import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { hostname } from 'node:os'
 
 export const inject = ['sessionQuery', 'timer']
@@ -54,6 +55,9 @@ function normalizeConfig(config) {
     endpoint: endpoint.replace(/\/+$/, ''),
     token: text(raw.token),
     tokenRef: text(raw.tokenRef) || 'CF_SESSION_SYNC_TOKEN',
+    // Optional file holding the secret (one trimmed line). Point it at an iCloud
+    // Drive or dotfiles path and a new machine needs no paste at all.
+    tokenFile: text(raw.tokenFile) || text(process.env.CF_SYNC_TOKEN_FILE),
     device,
     syncOnStart: raw.syncOnStart !== false,
     autoSync: raw.autoSync !== false,
@@ -132,6 +136,14 @@ export function apply(ctx, config) {
         }
       } catch {
         // An absent or unreadable store falls through to the configured value.
+      }
+    }
+    if (cfg.tokenFile) {
+      try {
+        const fromFile = readFileSync(cfg.tokenFile, 'utf8').trim()
+        if (fromFile) return { token: fromFile, source: 'token-file' }
+      } catch {
+        // A missing or unreadable file behaves like an unset one.
       }
     }
     if (cfg.token) return { token: cfg.token, source: 'config' }
